@@ -9,8 +9,14 @@ const Navbar = () => {
           <div className="cursor-pointer">🍔🍔🍔</div>
         </Link>
         <div className="flex grow justify-end">
+          <Link href="/" passHref>
+            <div className="cursor-pointer w-24">Today</div>
+          </Link>
           <Link href="/history" passHref>
-            <div className="cursor-pointer">History</div>
+            <div className="cursor-pointer w-24">History</div>
+          </Link>
+          <Link href="/settings" passHref>
+            <div className="cursor-pointer">Settings</div>
           </Link>
         </div>
       </div>
