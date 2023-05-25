@@ -7,7 +7,7 @@ const Summary = () => {
   const calorieCountsByDate = entries.reduce<Record<string, number>>(
     (acc, cur) => {
       const dateStr = cur.date.toLocaleString();
-      acc[dateStr] = cur.calories + (acc[dateStr] || 0);
+      acc[dateStr] = cur.calories ? cur.calories + acc[dateStr] : 0;
       return acc;
     },
     {}

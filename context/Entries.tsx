@@ -26,7 +26,7 @@ export const useEntries = (): [Entry[], (e: Entry[]) => void] => {
 
   useEffect(() => {
     try {
-      const entriesRaw = JSON.parse(localStorage.getItem('entries') || '');
+      const entriesRaw = JSON.parse(localStorage.getItem('entries') || 'null');
       const entries = entriesRaw.map((e: Record<string, string>) => Object.assign({}, e, { date: DateTime.fromISO(e.date) }));
       if (entries) {
         setEntries(entries);

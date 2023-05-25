@@ -8,12 +8,10 @@ import Header from "./Header";
 
 const Layout = ({ children }: { children: ReactNode }) => {
   const [entries, setEntries] = React.useState<Entry[]>([]);
-  console.log("entries updated");
-  console.log(entries);
 
   React.useEffect(() => {
     try {
-      const entriesRaw = JSON.parse(localStorage.getItem("entries") || "");
+      const entriesRaw = JSON.parse(localStorage.getItem("entries") || "null");
       const entries = entriesRaw.map((e: Record<string, string>) =>
         Object.assign({}, e, { date: DateTime.fromISO(e.date) })
       );

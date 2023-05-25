@@ -7,6 +7,7 @@ export type WeightEntry = {
 }
 
 type WeightMap = Record<string, number>;
+type WeightFn = (d: DateTime, e: number) => void;
 
 type WeightContext = {
   weights: WeightMap;
@@ -24,23 +25,24 @@ export const WeightContext = createContext<WeightContext>(initialState);
 
 export const useWeightContext = () => useContext(WeightContext);
 
-export const useWeight = () => {
+export const useWeight = (): [WeightMap, WeightFn] => {
   const weightRef = useRef<WeightMap>({});
 
   useEffect(() => {
     try {
-      const weightsParsed = JSON.parse(localStorage.getItem(KEY) || '');
+      const weightsParsed = JSON.parse(localStorage.getItem(KEY) || 'null');
       if (weightsParsed) {
         weightRef.current = weightsParsed;
       }
     } catch (error) {
-      console.error('Error parsing items from localStorage: ' + error)
+      console.error('Error parsing weights from localStorage: ' + error)
     }
   }, []);
 
   return [weightRef.current, (date: DateTime, value: number) => {
-    weightRef.current[date.toFormat('yyyy LLL dd')] = value;
+    weightRef.current[date.toFormat(WEIGHT_DAY_FMT)] = value;
     localStorage.setItem(KEY, JSON.stringify(weightRef.current));
   }];
 }
 
+export const WEIGHT_DAY_FMT = 'yyyy LLL dd';
