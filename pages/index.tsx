@@ -1,11 +1,11 @@
 import type { NextPage } from "next";
-import Calories from "components/Calories";
+import Daily from "components/Daily";
 
 const Home: NextPage = () => {
   return (
     <div className="font-sans">
       <div className="m-8">
-        <Calories />
+        <Daily />
       </div>
     </div>
   );

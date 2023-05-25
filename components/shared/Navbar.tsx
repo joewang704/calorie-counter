@@ -10,7 +10,7 @@ const Navbar = () => {
         </Link>
         <div className="flex grow justify-end">
           <Link href="/" passHref>
-            <div className="cursor-pointer w-24">Today</div>
+            <div className="cursor-pointer w-24">Daily</div>
           </Link>
           <Link href="/history" passHref>
             <div className="cursor-pointer w-24">History</div>

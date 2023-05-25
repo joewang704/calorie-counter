@@ -10,7 +10,7 @@ const monthArrowCx = "h-5 w-5 text-sky-500 cursor-pointer";
 type Props = {
   onSelect: (date: DateTime) => void;
   date: DateTime;
-}
+};
 
 const DatePicker = ({ onSelect, date }: Props) => {
   const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
@@ -19,13 +19,17 @@ const DatePicker = ({ onSelect, date }: Props) => {
 
   useEffect(() => {
     const fn = (event: MouseEvent) => {
-      if (event.target instanceof Element && ref.current && !ref.current.contains(event.target)) {
+      if (
+        event.target instanceof Element &&
+        ref.current &&
+        !ref.current.contains(event.target)
+      ) {
         setModalIsOpen(false);
       }
-    }
-    window.addEventListener('click', fn);
+    };
+    window.addEventListener("click", fn);
     return () => {
-      window.removeEventListener('click', fn);
+      window.removeEventListener("click", fn);
     };
   }, []);
 
@@ -61,18 +65,28 @@ const DatePicker = ({ onSelect, date }: Props) => {
           </div>
           <div className="grid grid-cols-7 w-60 mb-1">
             {["S", "M", "T", "W", "T", "F", "S"].map((wkd, i) => (
-              <div className="font-medium border-solid border-b border-gray-100" key={i}>{wkd}</div>
+              <div
+                className="font-medium border-solid border-b border-gray-100"
+                key={i}
+              >
+                {wkd}
+              </div>
             ))}
           </div>
           <div className="grid grid-cols-7 w-60">
             {daysInMonth.map((day, i) => {
               const isSelected = day.hasSame(date, "day");
-              const gridColumnStart = i === 0 ? month.plus({ days: 1 }).weekday : undefined;
-              const cursor = isSelected ? 'default' : 'pointer';
+              const gridColumnStart =
+                i === 0 ? month.plus({ days: 1 }).weekday : undefined;
+              const cursor = isSelected ? "default" : "pointer";
 
               return (
                 <div
-                  className={isSelected ? "bg-sky-400 rounded hover:bg-sky-200 hover:rounded flex justify-center items-center" : "hover:bg-sky-200 hover:rounded flex justify-center items-center"}
+                  className={
+                    isSelected
+                      ? "bg-sky-400 rounded hover:bg-sky-200 hover:rounded flex justify-center items-center"
+                      : "hover:bg-sky-200 hover:rounded flex justify-center items-center"
+                  }
                   onClick={() => {
                     onSelect(day);
                     setModalIsOpen(false);

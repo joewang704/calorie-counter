@@ -4,7 +4,7 @@ import { DateTime } from 'luxon';
 export type Entry = {
   date: DateTime;
   item: string;
-  calories: number;
+  calories?: number;
 }
 
 type EntriesContext = {
