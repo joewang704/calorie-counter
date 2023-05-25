@@ -7,6 +7,7 @@ import {
 
 import { useEntriesContext } from "context/Entries";
 import { useCalorieGoalContext } from "context/CalorieGoal";
+import { useWeight } from "context/Weights";
 import { isSameDay, isToday, today } from "utils/datetime";
 import Entries from "./Entries";
 
@@ -14,11 +15,12 @@ const monthArrowCx = "h-5 w-5 cursor-pointer";
 
 const Daily = () => {
   const { entries } = useEntriesContext();
-  const { calorieGoal, setCalorieGoal } = useCalorieGoalContext();
+  const { calorieGoal } = useCalorieGoalContext();
   const [day, setDay] = useState<DateTime>(today);
+  const [weights, setWeight] = useWeight();
   const totalCaloriesToday = entries
     .filter(({ date }) => isSameDay(date, day))
-    .reduce((acc, cur) => acc + cur.calories, 0);
+    .reduce((acc, cur) => acc + cur.calories!, 0);
 
   const prevDay = () => {
     setDay(day.minus({ days: 1 }));

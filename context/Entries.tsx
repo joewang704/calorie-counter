@@ -23,8 +23,6 @@ export const useEntriesContext = () => useContext(EntriesContext);
 
 export const useEntries = (): [Entry[], (e: Entry[]) => void] => {
   const [entries, setEntries] = useState<Entry[]>([]);
-  console.log('entries updated');
-  console.log(entries);
 
   useEffect(() => {
     try {
@@ -40,8 +38,6 @@ export const useEntries = (): [Entry[], (e: Entry[]) => void] => {
 
   return [entries, (e) => {
     setEntries(e);
-    console.log('new entries');
-    console.log(e);
     localStorage.setItem('entries', JSON.stringify(e));
   }];
 }
