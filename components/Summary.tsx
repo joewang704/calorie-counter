@@ -1,13 +1,23 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
-import { useEntriesContext } from "context/Entries";
+import { getFoods } from "utils/db";
 
 const Summary = () => {
-  const { entries } = useEntriesContext();
-  const calorieCountsByDate = entries.reduce<Record<string, number>>(
+  const [foods, setFoods] = useState<any[] | undefined>();
+  useEffect(() => {
+    getFoods().then(foods => {
+      setFoods(foods);
+    });
+  }, []);
+
+  if (!foods) {
+    return <>Loading...</>;
+  }
+
+  const calorieCountsByDate = foods.reduce<Record<string, number>>(
     (acc, cur) => {
       const dateStr = cur.date.toLocaleString();
-      acc[dateStr] = cur.calories ? cur.calories + acc[dateStr] : 0;
+      acc[dateStr] = cur.calories ? (cur.calories + (acc[dateStr] || 0)) : 0;
       return acc;
     },
     {}

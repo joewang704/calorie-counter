@@ -49,6 +49,7 @@ const Daily = () => {
         </h1>
         {isToday(day) || <ArrowNarrowRightIcon className={monthArrowCx} onClick={nextDay} />}
       </div>
+      <h1 className="mb-6">{totalCaloriesToday}</h1>
       <h2 className="text-lg mb-6">
         {calorieGoal} - {totalCaloriesToday} ={" "}
         {calorieGoal - totalCaloriesToday}
