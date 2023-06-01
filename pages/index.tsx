@@ -1,13 +1,7 @@
 import type { NextPage } from "next";
-import { getAuth, GoogleAuthProvider, User, signInWithPopup } from "firebase/auth";
 
 import Daily from "components/Daily";
-import { app } from "utils/db";
-import { useState } from "react";
-
-const auth = getAuth(app);
-
-const provider = new GoogleAuthProvider();
+import { useUserContext } from "context/User";
 
 const GoogleSignInButton = ({ onClick }: { onClick: () => void }) => {
   return (
@@ -22,28 +16,10 @@ const GoogleSignInButton = ({ onClick }: { onClick: () => void }) => {
 }
 
 const Home: NextPage = () => {
-  const [user, setUser] = useState<User | undefined>();
+  const { user, loading, signIn } = useUserContext();
 
-  const signIn = () => {
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        // This gives you a Google Access Token. You can use it to access the Google API.
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        const token = credential!.accessToken;
-        // The signed-in user info.
-        const user = result.user;
-        setUser(user);
-      }).catch((error) => {
-        // Handle Errors here.
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        // The email of the user's account used.
-        const email = error.customData.email;
-        // The AuthCredential type that was used.
-        const credential = GoogleAuthProvider.credentialFromError(error);
-        // TODO: display error
-        console.error(errorMessage);
-      });
+  if (loading) {
+    return <></>;
   }
 
   return (

@@ -1,16 +1,12 @@
+import { useFoodsContext } from "context/Entries";
 import React, { useState, useEffect } from "react";
 
 import { getFoods } from "utils/db";
 
 const Summary = () => {
-  const [foods, setFoods] = useState<any[] | undefined>();
-  useEffect(() => {
-    getFoods().then(foods => {
-      setFoods(foods);
-    });
-  }, []);
+  const { foods, loading } = useFoodsContext();
 
-  if (!foods) {
+  if (!foods || loading) {
     return <>Loading...</>;
   }
 

@@ -1,43 +1,34 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import { DateTime } from 'luxon';
+import { ReactNode, createContext, useContext } from 'react';
 
-export type Entry = {
-  date: DateTime;
-  item: string;
-  calories?: number;
+import { useFoods } from 'utils/food';
+import { StoredFood } from 'utils/db';
+
+type FoodsContext = {
+  foods: StoredFood[] | undefined;
+  loading: boolean;
+  refetch: () => void;
 }
 
-type EntriesContext = {
-  entries: Entry[];
-  setEntries: (e: Entry[]) => void;
-}
-
-const initialState: EntriesContext = {
-  entries: [],
-  setEntries: () => {},
+const initialState: FoodsContext = {
+  foods: [],
+  loading: true,
+  refetch: () => {},
 };
 
-export const EntriesContext = createContext<EntriesContext>(initialState);
+export const FoodsContext = createContext<FoodsContext>(initialState);
 
-export const useEntriesContext = () => useContext(EntriesContext);
+export const useFoodsContext = () => useContext(FoodsContext);
 
-export const useEntries = (): [Entry[], (e: Entry[]) => void] => {
-  const [entries, setEntries] = useState<Entry[]>([]);
+export const FoodsProvider = ({ children }: { children: ReactNode }) => {
+  const { foods, loading, refetch } = useFoods();
 
-  useEffect(() => {
-    try {
-      const entriesRaw = JSON.parse(localStorage.getItem('entries') || 'null');
-      const entries = entriesRaw.map((e: Record<string, string>) => Object.assign({}, e, { date: DateTime.fromISO(e.date) }));
-      if (entries) {
-        setEntries(entries);
-      }
-    } catch (error) {
-      console.error('Error parsing items from localStorage: ' + error)
-    }
-  }, []);
-
-  return [entries, (e) => {
-    setEntries(e);
-    localStorage.setItem('entries', JSON.stringify(e));
-  }];
+  return (
+    <FoodsContext.Provider value={{
+      foods,
+      loading,
+      refetch,
+    }}>
+      {children}
+    </FoodsContext.Provider>
+  );
 }

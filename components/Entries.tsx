@@ -3,39 +3,38 @@ import { DateTime } from "luxon";
 import { PencilAltIcon } from "@heroicons/react/solid";
 
 import DatePicker from "./DatePicker";
-import { Entry, useEntriesContext } from "context/Entries";
+import { useUserContext } from "context/User";
+import { AddFoodParams, Food, UpdateFoodParams, addFood, setFood } from "utils/db";
+import { useFoodsContext } from "context/Entries";
+import { NumericInput } from "./shared/NumericInput";
 
 const now = DateTime.now();
 
 type Props = {
-  filter?: (entry: Entry) => boolean;
+  filter?: (f: Food) => boolean;
   readonlyDate?: boolean;
   defaultDate?: DateTime;
 };
 
 const Entries = ({ filter, readonlyDate, defaultDate }: Props) => {
-  const { entries, setEntries } = useEntriesContext();
   const [editingID, setEditingID] = useState<number | undefined>();
-  const [page, setPage] = useState<number>(0);
+  const { foods, loading, refetch } = useFoodsContext();
 
-  const addEntry = ({ date, item, calories }: Entry) => {
-    const newEntries = entries?.concat([
-      {
-        date,
-        item,
-        calories,
-      },
-    ]);
-    setEntries(newEntries);
+  const addEntry = (params: AddFoodParams) => {
+    addFood(params);
   };
 
-  const updateEntry = (entry: Entry) => {
-    entries[editingID!] = entry;
-    setEntries(entries);
+  const updateEntry = (params: UpdateFoodParams) => {
+    setFood(params);
+    refetch();
     setEditingID(undefined);
   };
 
-  const displayedEntries = filter ? entries.filter(filter) : entries;
+  if (loading) {
+    return <>Loading...</>;
+  }
+
+  const displayedFoods = foods ? (filter ? foods.filter(filter) : foods) : [];
 
   return (
     <>
@@ -48,11 +47,11 @@ const Entries = ({ filter, readonlyDate, defaultDate }: Props) => {
           onSubmit={addEntry}
           readonlyDate={readonlyDate}
           initialState={
-            defaultDate && { date: defaultDate, item: "", calories: undefined }
+            defaultDate && { date: defaultDate, name: "", calories: undefined }
           }
         />
 
-        {displayedEntries
+        {displayedFoods
           ?.sort((a, b) => {
             if (a.date == b.date) {
               return 0;
@@ -61,19 +60,20 @@ const Entries = ({ filter, readonlyDate, defaultDate }: Props) => {
             }
             return -1;
           })
-          .map(({ date, item, calories }, i) =>
+          .map(({ date, name, calories, id }, i) =>
             i === editingID ? (
               <EntryForm
                 onSubmit={updateEntry}
-                initialState={{ date, item, calories }}
+                initialState={{ date, name, calories }}
                 submitText="Update"
                 readonlyDate={readonlyDate}
+                id={id}
                 key={i}
               />
             ) : (
               <React.Fragment key={i}>
                 <div>{date.toLocaleString()}</div>
-                <div>{item}</div>
+                <div>{name}</div>
                 <div>{calories}</div>
                 <div className="flex items-center">
                   <PencilAltIcon
@@ -90,10 +90,11 @@ const Entries = ({ filter, readonlyDate, defaultDate }: Props) => {
 };
 
 type FormProps = {
-  onSubmit: (e: Entry) => void;
-  initialState?: Entry;
+  onSubmit: (e: any) => void;
+  initialState?: Food & { calories?: number };
   submitText?: string;
   readonlyDate?: boolean;
+  id?: string;
 };
 
 const EntryForm = ({
@@ -101,27 +102,30 @@ const EntryForm = ({
   initialState,
   submitText,
   readonlyDate,
+  id,
 }: FormProps) => {
+  const { user } = useUserContext();
   const [date, setDate] = useState<DateTime>(initialState?.date || now);
-  const [item, setItem] = useState<string>(initialState?.item || "");
+  const [name, setName] = useState<string>(initialState?.name || "");
+  // const [calories, setCalories] = useState<string | undefined>(initialState?.calories);
   const [calories, setCalories] = useState<number | undefined>(initialState?.calories);
 
   useEffect(() => {
     if (initialState) {
       setDate(initialState.date);
-      setItem(initialState.item);
+      setName(initialState.name);
       setCalories(initialState.calories);
     }
   }, [initialState]);
 
   const valid =
     date.isValid &&
-    !!item &&
+    !!name &&
     Number.isSafeInteger(Number(calories)) &&
     Number(calories) > 0;
 
   const resetForm = () => {
-    setItem("");
+    setName("");
     setCalories(undefined);
   };
 
@@ -137,20 +141,18 @@ const EntryForm = ({
       <input
         type="text"
         autoFocus
-        value={item}
-        onChange={(e) => setItem(e.target.value)}
+        value={name}
+        onChange={(e) => setName(e.target.value)}
       />
-      <input
-        type="number"
-        step="any"
-        value={calories}
-        onChange={(e) => setCalories(Number(e.target.value))}
-      />
+      <NumericInput value={calories} onChange={(c) => setCalories(c)} />
       <button
         className="bg-blue-500 p-2 rounded text-white hover:bg-blue-400 cursor:pointer disabled:bg-gray-300 disabled:hover:bg-gray-300"
         disabled={!valid}
         onClick={() => {
-          onSubmit({ date, item, calories });
+          if (!calories) {
+            throw new Error('Calories must exist');
+          }
+          onSubmit({ date, name, calories: Number(calories), email: user!.email!, id });
           resetForm();
         }}
       >
