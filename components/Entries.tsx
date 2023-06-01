@@ -91,7 +91,11 @@ const Entries = ({ filter, readonlyDate, defaultDate }: Props) => {
 
 type FormProps = {
   onSubmit: (e: any) => void;
-  initialState?: Food & { calories?: number };
+  initialState?: {
+    date: DateTime;
+    name: string;
+    calories?: number;
+  }
   submitText?: string;
   readonlyDate?: boolean;
   id?: string;
